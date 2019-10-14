@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  db: 
+    image: mysql:5.7.20
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "(password123)" #probably should change this
+      MYSQL_DATABASE: "containerdb"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "user1234"
+
+  web_debug:
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    volumes:
+        - ${PWD}/www:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    environment:
+        XDEBUG_CONFIG: remote_host=host.docker.internal remote_port=9001 remote_enable=1
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports: 
+      - "8080:80"
+    depends_on:
+      - db
